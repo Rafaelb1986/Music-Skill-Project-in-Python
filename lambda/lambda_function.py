@@ -39,8 +39,8 @@ DATASOURCE = {
             "coverImageSource": create_presigned_url("Media/Cinelax.jpg"),
             "headerTitle": "Midnight Radio",
             "logoUrl": create_presigned_url("Media/icon_108_A2Z.png"),
-            "primaryText": "Welcome to the midnight radio",
-            "secondaryText": "Enjoy the music",
+            "primaryText": "Cinelax by Liborio Conti",
+            "secondaryText": "Album: Relaxing Music for the senses",
             "sliderType": "determinate"
         }
     }
@@ -83,8 +83,8 @@ class LaunchRequestHandler(AbstractRequestHandler):
                         offset_in_milliseconds=0
                     ),
                     metadata=AudioItemMetadata(
-                        title="Midnight Radio",
-                        subtitle="Enjoy the music"
+                        title="Cinelax by Liborio Conti",
+                        subtitle="Album: Relaxing Music for the senses"
                     )
                 )
             )
@@ -115,79 +115,8 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
         return handler_input.response_builder.speak(speak_output).response
 
-class HelloWorldIntentHandler(AbstractRequestHandler):
-    """Handler for Hello World Intent."""
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_intent_name("HelloWorldIntent")(handler_input)
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        speak_output = "Hello World!"
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
-                .response
-        )
-
-
-class HelpIntentHandler(AbstractRequestHandler):
-    """Handler for Help Intent."""
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_intent_name("AMAZON.HelpIntent")(handler_input)
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        speak_output = "You can say hello to me! How can I help?"
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
-        )
-
-class UnhandledFeaturesIntentHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input):
-        return (is_intent_name("AMAZON.LoopOnIntent")(handler_input)
-                or is_intent_name("AMAZON.NavigateHomeIntent")(handler_input)
-                or is_intent_name("AMAZON.RepeatIntent")(handler_input)
-                or is_intent_name("AMAZON.PreviousIntent")(handler_input)
-                or is_intent_name("AMAZON.NextIntent")(handler_input)
-                or is_intent_name("AMAZON.ShuffleOnIntent")(handler_input)
-                or is_intent_name("AMAZON.ShuffleOffIntent")(handler_input)
-                or is_intent_name("AMAZON.LoopOffIntent")(handler_input)
-                )
-    
-    def handle(self, handler_input):
-        speak_output = "This feature is not supported."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .response
-        )
-    
-class CancelOrStopIntentHandler(AbstractRequestHandler):
-    """Single handler for Cancel and Stop Intents."""
-    def can_handle(self, handler_input):
-        return is_intent_name("AMAZON.CancelIntent")(handler_input)
-
-    def handle(self, handler_input):
-        return (
-            handler_input.response_builder
-                .add_directive(ClearQueueDirective(clear_behavior=ClearBehavior.CLEAR_ALL))
-                .add_directive(StopDirective())
-                .speak("Goodbye!")
-                .set_should_end_session(True)
-                .response
-        )
-
 class PauseIntentHandler(AbstractRequestHandler):
-    """Handler for Pause Intent."""
+    """Handler for Pause and Stop Intents."""
     
     def can_handle(self, handler_input):
         return (ask_utils.is_intent_name("AMAZON.PauseIntent")(handler_input) 
@@ -227,7 +156,7 @@ class PauseIntentHandler(AbstractRequestHandler):
 
         return response_builder.speak(speak_output).response
 
-class ResumeIntentHandler(AbstractRequestHandler):
+class ResumeStopIntentHandler(AbstractRequestHandler):
     """Handler for Resume Intent."""
     
     def can_handle(self, handler_input):
@@ -267,8 +196,8 @@ class ResumeIntentHandler(AbstractRequestHandler):
                             offset_in_milliseconds=offset
                         ),
                         metadata=AudioItemMetadata(
-                            title="Midnight Radio",
-                            subtitle="Enjoy the music"
+                            title="Cinelax by Liborio Conti",
+                            subtitle="Album: Relaxing Music for the senses"
                         )
                     )
                 )
@@ -276,8 +205,23 @@ class ResumeIntentHandler(AbstractRequestHandler):
 
         return response_builder.speak(speak_output).response
 
+class CancelIntentHandler(AbstractRequestHandler):
+    """Single handler for Cancel Intent."""
+    def can_handle(self, handler_input):
+        return is_intent_name("AMAZON.CancelIntent")(handler_input)
+
+    def handle(self, handler_input):
+        return (
+            handler_input.response_builder
+                .add_directive(ClearQueueDirective(clear_behavior=ClearBehavior.CLEAR_ALL))
+                .add_directive(StopDirective())
+                .speak("Goodbye!")
+                .set_should_end_session(True)
+                .response
+        )
+
 class StartOverIntentHandler(AbstractRequestHandler):
-    """Handler for Skill Launch."""
+    """Handler for starting over."""
     
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
@@ -315,14 +259,13 @@ class StartOverIntentHandler(AbstractRequestHandler):
                     ),
                     metadata=AudioItemMetadata(
                         title="Midnight Radio",
-                        subtitle="Enjoy the music"
+                        subtitle="Album: Relaxing Music for the senses"
                     )
                 )
             )
         )
 
     def handle(self, handler_input):
-        speak_output = "Welcome, to midnight radio"
         
         # Check if the device supports APL
         if self.supports_apl(handler_input):
@@ -344,8 +287,47 @@ class StartOverIntentHandler(AbstractRequestHandler):
             # Only play audio if APL is NOT supported
             self.launch_audio(handler_input)
 
-        return handler_input.response_builder.speak(speak_output).response
+        return handler_input.response_builder.response
 
+class HelpIntentHandler(AbstractRequestHandler):
+    """Handler for Help Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("AMAZON.HelpIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "This is midnight radio, enjoy the music"
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+class UnhandledFeaturesIntentHandler(AbstractRequestHandler):
+    """Handler for Unsupported Features."""
+    def can_handle(self, handler_input):
+        return (is_intent_name("AMAZON.LoopOnIntent")(handler_input)
+                or is_intent_name("AMAZON.NavigateHomeIntent")(handler_input)
+                or is_intent_name("AMAZON.RepeatIntent")(handler_input)
+                or is_intent_name("AMAZON.PreviousIntent")(handler_input)
+                or is_intent_name("AMAZON.NextIntent")(handler_input)
+                or is_intent_name("AMAZON.ShuffleOnIntent")(handler_input)
+                or is_intent_name("AMAZON.ShuffleOffIntent")(handler_input)
+                or is_intent_name("AMAZON.LoopOffIntent")(handler_input)
+                )
+    
+    def handle(self, handler_input):
+        speak_output = "This feature is not supported."
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .response
+        )
+    
 class FallbackIntentHandler(AbstractRequestHandler):
     """Single handler for Fallback Intent."""
     def can_handle(self, handler_input):
@@ -427,13 +409,12 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
-sb.add_request_handler(UnhandledFeaturesIntentHandler())
 sb.add_request_handler(PauseIntentHandler())
-sb.add_request_handler(ResumeIntentHandler())
-sb.add_request_handler(HelloWorldIntentHandler())
-sb.add_request_handler(HelpIntentHandler())
-sb.add_request_handler(CancelOrStopIntentHandler())
+sb.add_request_handler(ResumeStopIntentHandler())
+sb.add_request_handler(CancelIntentHandler())
 sb.add_request_handler(StartOverIntentHandler())
+sb.add_request_handler(HelpIntentHandler())
+sb.add_request_handler(UnhandledFeaturesIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_request_handler(IntentReflectorHandler()) # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
