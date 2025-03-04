@@ -96,6 +96,19 @@ class LaunchRequestHandler(AbstractRequestHandler):
         # Check if the device supports APL
         if self.supports_apl(handler_input):
             self.launch_screen(handler_input)
+            handler_input.response_builder.add_directive(
+                ExecuteCommandsDirective(
+                    token="documentToken",
+                    commands=[
+                        {
+                            "type": "SetValue",
+                            "componentId": "MainPlayButton",
+                            "property": "checked",
+                            "value": True
+                        }
+                    ]
+                )
+            )
         else:
             # Only play audio if APL is NOT supported
             self.launch_audio(handler_input)
@@ -198,7 +211,13 @@ class PauseIntentHandler(AbstractRequestHandler):
                 ExecuteCommandsDirective(
                     token="documentToken",
                     commands=[
-                        ControlMediaCommand(component_id="videoPlayer", command="pause")
+                        ControlMediaCommand(component_id="videoPlayer", command="pause"),
+                        {
+                            "type": "SetValue",
+                            "componentId": "MainPlayButton",
+                            "property": "checked",
+                            "value": False
+                        }
                     ]
                 )
             )
@@ -207,7 +226,6 @@ class PauseIntentHandler(AbstractRequestHandler):
             response_builder.add_directive(StopDirective())
 
         return response_builder.speak(speak_output).response
-
 
 class ResumeIntentHandler(AbstractRequestHandler):
     """Handler for Resume Intent."""
@@ -228,7 +246,13 @@ class ResumeIntentHandler(AbstractRequestHandler):
                 ExecuteCommandsDirective(
                     token="documentToken",
                     commands=[
-                        ControlMediaCommand(component_id="videoPlayer", command="play")
+                        ControlMediaCommand(component_id="videoPlayer", command="play"),
+                        {
+                            "type": "SetValue",
+                            "componentId": "MainPlayButton",
+                            "property": "checked",
+                            "value": True
+                        }
                     ]
                 )
             )
@@ -298,11 +322,24 @@ class StartOverIntentHandler(AbstractRequestHandler):
         )
 
     def handle(self, handler_input):
-        speak_output = "Starting Over midnight radio"
+        speak_output = "Welcome, to midnight radio"
         
         # Check if the device supports APL
         if self.supports_apl(handler_input):
             self.launch_screen(handler_input)
+            handler_input.response_builder.add_directive(
+                ExecuteCommandsDirective(
+                    token="documentToken",
+                    commands=[
+                        {
+                            "type": "SetValue",
+                            "componentId": "MainPlayButton",
+                            "property": "checked",
+                            "value": True
+                        }
+                    ]
+                )
+            )
         else:
             # Only play audio if APL is NOT supported
             self.launch_audio(handler_input)
