@@ -168,6 +168,8 @@ class ResumeStopIntentHandler(AbstractRequestHandler):
 
         speak_output = "Resuming Midnight Radio."
 
+        logger.info(f"ResumeStopIntentHandler: Retrieved offset {offset} milliseconds")
+
         response_builder = handler_input.response_builder
 
         if get_supported_interfaces(handler_input).alexa_presentation_apl is not None:
@@ -297,7 +299,7 @@ class HelpIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "This is midnight radio, enjoy the music"
+        speak_output = "This is midnight radio, enjoy the music. To play the music, simply say open midnight radio"
 
         return (
             handler_input.response_builder
