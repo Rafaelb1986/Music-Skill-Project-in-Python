@@ -291,6 +291,37 @@ class StartOverIntentHandler(AbstractRequestHandler):
 
         return handler_input.response_builder.response
 
+class PlaybackFinishedHandler(AbstractRequestHandler):
+    """Handler for AudioPlayer PlaybackFinished request."""
+    
+    def can_handle(self, handler_input):
+        return ask_utils.is_request_type("AudioPlayer.PlaybackFinished")(handler_input)
+
+    def handle(self, handler_input):
+        logger.info("Audio playback finished. Ending session.")
+        
+        return (
+            handler_input.response_builder
+                .set_should_end_session(True)
+                .response
+        )
+
+class WhoIsPlayingIntent(AbstractRequestHandler):
+    """Handler for Help Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("whoIsPlaying")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You are listening the song Cinelax by Liborio Conti from the album Relaxing Music for the senses"
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .response
+        )
+
 class HelpIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
     def can_handle(self, handler_input):
@@ -415,7 +446,9 @@ sb.add_request_handler(PauseIntentHandler())
 sb.add_request_handler(ResumeStopIntentHandler())
 sb.add_request_handler(CancelIntentHandler())
 sb.add_request_handler(StartOverIntentHandler())
+sb.add_request_handler(WhoIsPlayingIntent())
 sb.add_request_handler(HelpIntentHandler())
+sb.add_request_handler(PlaybackFinishedHandler())
 sb.add_request_handler(UnhandledFeaturesIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())

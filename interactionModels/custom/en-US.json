@@ -70,6 +70,16 @@
             "about this skill",
             "about"
           ]
+        },
+        {
+          "slots": [],
+          "name": "whoIsPlaying",
+          "samples": [
+            "give me the name of the song",
+            "name the song and artist",
+            "what song is this",
+            "who is playing"
+          ]
         }
       ],
       "types": [],
