@@ -64,15 +64,6 @@
         },
         {
           "slots": [],
-          "name": "aboutIntent",
-          "samples": [
-            "about the skill",
-            "about this skill",
-            "about"
-          ]
-        },
-        {
-          "slots": [],
           "name": "whoIsPlaying",
           "samples": [
             "give me the name of the song",
