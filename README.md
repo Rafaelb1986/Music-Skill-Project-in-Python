@@ -2,7 +2,7 @@ The Music Skill Project is an Alexa skill designed to play audio files hosted on
 
 Features:
 
-- User-Friendly: The skill is designed for ease of use and understanding, with plans to include a step-by-step guide upon completion.
+- User-Friendly: The skill is designed for ease of use and understanding.
 
 - Customizable: Users can tailor the skill to their specific needs.
 
