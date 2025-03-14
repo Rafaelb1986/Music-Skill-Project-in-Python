@@ -21,7 +21,7 @@ logger.setLevel(logging.INFO)
 # Loads the metadata for the APL document.
 APL_DOCUMENT_ID = "audioplayer"
 
-APL_DOCUMENT_TOKEN = "documentToken"
+APL_DOCUMENT_TOKEN = "audioPlayerToken"
 
 DATASOURCE = {
     "audioPlayerTemplateData": {
@@ -58,7 +58,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
         if self.supports_apl(handler_input):
             handler_input.response_builder.add_directive(
                 RenderDocumentDirective(
-                    token="documentToken",
+                    token="audioPlayerToken",
                     document={
                         "type": "Link",
                         "src": f"doc://alexa/apl/documents/audioplayer"
@@ -93,7 +93,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
             self.launch_screen(handler_input)
             handler_input.response_builder.add_directive(
                 ExecuteCommandsDirective(
-                    token="documentToken",
+                    token="audioPlayerToken",
                     commands=[
                         {
                             "type": "SetValue",
@@ -126,7 +126,7 @@ class PauseIntentHandler(AbstractRequestHandler):
         if get_supported_interfaces(handler_input).alexa_presentation_apl is not None:
             response_builder.add_directive(
                 ExecuteCommandsDirective(
-                    token="documentToken",
+                    token="audioPlayerToken",
                     commands=[
                         ControlMediaCommand(component_id="videoPlayer", command="pause"),
                         {
@@ -159,7 +159,7 @@ class ResumeStopIntentHandler(AbstractRequestHandler):
         if get_supported_interfaces(handler_input).alexa_presentation_apl is not None:
             response_builder.add_directive(
                 ExecuteCommandsDirective(
-                    token="documentToken",
+                    token="audioPlayerToken",
                     commands=[
                         ControlMediaCommand(component_id="videoPlayer", command="play"),
                         {
@@ -222,7 +222,7 @@ class StartOverIntentHandler(AbstractRequestHandler):
         if self.supports_apl(handler_input):
             handler_input.response_builder.add_directive(
                 RenderDocumentDirective(
-                    token="documentToken",
+                    token="audioPlayerToken",
                     document={
                         "type": "Link",
                         "src": f"doc://alexa/apl/documents/audioplayer"
@@ -256,7 +256,7 @@ class StartOverIntentHandler(AbstractRequestHandler):
             self.launch_screen(handler_input)
             handler_input.response_builder.add_directive(
                 ExecuteCommandsDirective(
-                    token="documentToken",
+                    token="audioPlayerToken",
                     commands=[
                         {
                             "type": "SetValue",
