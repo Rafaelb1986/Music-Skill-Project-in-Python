@@ -54,18 +54,17 @@ class LaunchRequestHandler(AbstractRequestHandler):
         return supported_interfaces.alexa_presentation_apl is not None
 
     def launch_screen(self, handler_input):
-        # Only add APL directive if User's device supports APL
-        if self.supports_apl(handler_input):
-            handler_input.response_builder.add_directive(
-                RenderDocumentDirective(
-                    token="audioPlayerToken",
-                    document={
-                        "type": "Link",
-                        "src": f"doc://alexa/apl/documents/audioplayer"
-                    },
-                    datasources=DATASOURCE
-                )
+        # Add APL directive
+        handler_input.response_builder.add_directive(
+            RenderDocumentDirective(
+                token="audioPlayerToken",
+                document={
+                    "type": "Link",
+                    "src": f"doc://alexa/apl/documents/audioplayer"
+                },
+                datasources=DATASOURCE
             )
+        )
 
     def launch_audio(self, handler_input):
         # Add AudioPlayer directive to play audio
@@ -89,7 +88,8 @@ class LaunchRequestHandler(AbstractRequestHandler):
         speak_output = "Welcome, to midnight radio"
         
         # Check if the device supports APL
-        if self.supports_apl(handler_input):
+        apl_supported = self.supports_apl(handler_input)
+        if apl_supported:
             self.launch_screen(handler_input)
             handler_input.response_builder.add_directive(
                 ExecuteCommandsDirective(
@@ -209,7 +209,6 @@ class StartOverIntentHandler(AbstractRequestHandler):
     """Handler for starting over."""
     
     def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("AMAZON.StartOverIntent")(handler_input)
 
     def supports_apl(self, handler_input):
@@ -218,18 +217,17 @@ class StartOverIntentHandler(AbstractRequestHandler):
         return supported_interfaces.alexa_presentation_apl is not None
 
     def launch_screen(self, handler_input):
-        # Only add APL directive if User's device supports APL
-        if self.supports_apl(handler_input):
-            handler_input.response_builder.add_directive(
-                RenderDocumentDirective(
-                    token="audioPlayerToken",
-                    document={
-                        "type": "Link",
-                        "src": f"doc://alexa/apl/documents/audioplayer"
-                    },
-                    datasources=DATASOURCE
-                )
+        # Add APL directive
+        handler_input.response_builder.add_directive(
+            RenderDocumentDirective(
+                token="audioPlayerToken",
+                document={
+                    "type": "Link",
+                    "src": f"doc://alexa/apl/documents/audioplayer"
+                },
+                datasources=DATASOURCE
             )
+        )
 
     def launch_audio(self, handler_input):
         # Add AudioPlayer directive to play audio
@@ -250,9 +248,11 @@ class StartOverIntentHandler(AbstractRequestHandler):
         )
 
     def handle(self, handler_input):
+        speak_output = "Starting over Midnight Radio."
         
         # Check if the device supports APL
-        if self.supports_apl(handler_input):
+        apl_supported = self.supports_apl(handler_input)
+        if apl_supported:
             self.launch_screen(handler_input)
             handler_input.response_builder.add_directive(
                 ExecuteCommandsDirective(
@@ -271,22 +271,7 @@ class StartOverIntentHandler(AbstractRequestHandler):
             # Only play audio if APL is NOT supported
             self.launch_audio(handler_input)
 
-        return handler_input.response_builder.response
-
-class PlaybackFinishedHandler(AbstractRequestHandler):
-    """Handler for AudioPlayer PlaybackFinished request."""
-    
-    def can_handle(self, handler_input):
-        return ask_utils.is_request_type("AudioPlayer.PlaybackFinished")(handler_input)
-
-    def handle(self, handler_input):
-        logger.info("Audio playback finished. Ending session.")
-        
-        return (
-            handler_input.response_builder
-                .set_should_end_session(True)
-                .response
-        )
+        return handler_input.response_builder.speak(speak_output).response
 
 class WhoIsPlayingIntent(AbstractRequestHandler):
     """Handler for Help Intent."""
@@ -358,17 +343,35 @@ class FallbackIntentHandler(AbstractRequestHandler):
 
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for Session End."""
+    
     def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
+        return (ask_utils.is_request_type("SessionEndedRequest")(handler_input) or
+                ask_utils.is_request_type("AudioPlayer.PlaybackFinished")(handler_input))
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-
         # Any cleanup logic goes here.
+        logger.info("Session ended or audio playback finished. Ending session.")
 
-        return handler_input.response_builder.response
+        response_builder = handler_input.response_builder
 
+        # Check if the device supports APL
+        if get_supported_interfaces(handler_input).alexa_presentation_apl is not None:
+            response_builder.add_directive(
+                ExecuteCommandsDirective(
+                    token="audioPlayerToken",
+                    commands=[
+                        ControlMediaCommand(component_id="videoPlayer", command="pause"),
+                        {
+                            "type": "SetValue",
+                            "componentId": "MainPlayButton",
+                            "property": "checked",
+                            "value": False
+                        }
+                    ]
+                )
+            )
+
+        return response_builder.set_should_end_session(True).response
 
 sb = SkillBuilder()
 
@@ -379,7 +382,6 @@ sb.add_request_handler(CancelIntentHandler())
 sb.add_request_handler(StartOverIntentHandler())
 sb.add_request_handler(WhoIsPlayingIntent())
 sb.add_request_handler(HelpIntentHandler())
-sb.add_request_handler(PlaybackFinishedHandler())
 sb.add_request_handler(UnhandledFeaturesIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
