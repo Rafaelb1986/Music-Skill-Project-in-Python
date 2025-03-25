@@ -13,6 +13,7 @@ Features:
 Known Issues:
 
 - Playback Progress: On devices without screens, the skill currently cannot save track progress when paused.
+- Playback Stop: On devices that have screens, once the audio reaches the end, the play/pause button does not toggle from pause to play.
 
 Implementation Overview:
 
